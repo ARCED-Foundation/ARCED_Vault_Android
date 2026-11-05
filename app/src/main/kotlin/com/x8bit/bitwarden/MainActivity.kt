@@ -30,6 +30,7 @@ import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.bitwarden.ui.platform.util.setHorizonOSAppLayout
 import com.bitwarden.ui.platform.util.setupEdgeToEdge
 import com.bitwarden.ui.platform.util.validate
+import com.x8bit.bitwarden.arced.ArcedUpdateCheck
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityCompletionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillActivityManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillCompletionManager
@@ -114,6 +115,7 @@ class MainActivity : AppCompatActivity() {
         window.decorView.filterTouchesWhenObscured = true
         if (savedInstanceState == null) {
             mainViewModel.trySendAction(MainAction.ReceiveFirstIntent(intent = intent))
+            ArcedUpdateCheck.run(activity = this)
         }
 
         // Within the app the theme will change dynamically and will be managed by the

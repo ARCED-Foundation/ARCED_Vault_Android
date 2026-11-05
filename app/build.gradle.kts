@@ -46,7 +46,7 @@ val ciProperties = Properties().apply {
 base {
     // Set the base archive name for publishing purposes. This is used to derive the
     // APK and AAB artifact names when uploading to Firebase and Play Store.
-    archivesName.set("com.x8bit.bitwarden")
+    archivesName.set("foundation.arced.vault")
 }
 
 room {
@@ -60,7 +60,7 @@ configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        applicationId = "com.x8bit.bitwarden"
+        applicationId = "foundation.arced.vault"
         minSdk {
             version = release(libs.versions.minSdk.get().toInt())
         }
@@ -82,6 +82,16 @@ configure<ApplicationExtension> {
             name = "SDK_VERSION",
             value = "\"${libs.versions.bitwardenSdk.get()}\"",
         )
+        // ARCED: where the in-app update check looks. Override with -ParcedUpdateUrl=... (or
+        // set it to "" to switch the check off).
+        buildConfigField(
+            type = "String",
+            name = "ARCED_UPDATE_URL",
+            value = "\"${
+                findProperty("arcedUpdateUrl")
+                    ?: "https://vault.arced.foundation/get/download/android/latest.json"
+            }\"",
+        )
     }
 
     androidResources {
@@ -95,6 +105,16 @@ configure<ApplicationExtension> {
             keyPassword = "android"
             storeFile = file("../keystores/debug.keystore")
             storePassword = "android"
+        }
+        // ARCED release key. CI decodes it from the ARCED_KEYSTORE_BASE64 secret; without these
+        // variables, release builds come out unsigned.
+        System.getenv("ARCED_KEYSTORE_FILE")?.let { keystore ->
+            create("arced") {
+                storeFile = file(keystore)
+                storePassword = System.getenv("ARCED_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ARCED_KEY_ALIAS")
+                keyPassword = System.getenv("ARCED_KEY_PASSWORD")
+            }
         }
     }
 
@@ -125,6 +145,7 @@ configure<ApplicationExtension> {
             buildConfigField(type = "boolean", name = "HAS_LOGS_ENABLED", value = "false")
         }
         release {
+            signingConfig = signingConfigs.findByName("arced")
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true

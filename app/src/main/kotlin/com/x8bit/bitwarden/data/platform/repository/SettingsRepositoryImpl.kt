@@ -526,13 +526,14 @@ class SettingsRepositoryImpl(
         val userId = activeUserId ?: return MutableStateFlow(false)
         return settingsDiskSource
             .getPullToRefreshEnabledFlow(userId = userId)
-            .map { it ?: false }
+            // ARCED: on by default, since the F-Droid build has no push sync.
+            .map { it ?: true }
             .stateIn(
                 scope = unconfinedScope,
                 started = SharingStarted.Eagerly,
                 initialValue = settingsDiskSource
                     .getPullToRefreshEnabled(userId = userId)
-                    ?: false,
+                    ?: true,
             )
     }
 

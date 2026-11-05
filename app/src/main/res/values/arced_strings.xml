@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ARCED in-app update check (ArcedUpdateCheck.kt). -->
+    <string name="arced_update_available" translatable="false">Update available</string>
+    <string name="arced_update_message" translatable="false">ARCEDians Vault %1$s is available. Download it now, then open the file to install it.</string>
+    <string name="arced_update_download" translatable="false">Download</string>
+    <string name="arced_update_later" translatable="false">Later</string>
+</resources>

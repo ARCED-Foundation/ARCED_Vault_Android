@@ -28,6 +28,7 @@ import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
+import com.x8bit.bitwarden.BuildConfig
 import com.x8bit.bitwarden.ui.platform.util.displayLabel
 import kotlinx.collections.immutable.ImmutableList
 
@@ -60,6 +61,8 @@ fun EnvironmentSelector(
     modifier: Modifier = Modifier,
     isHelpEnabled: Boolean = true,
 ) {
+    // ARCED: the server is preset; only dev builds can pick another one.
+    if (!BuildConfig.HAS_DEBUG_MENU) return
     var shouldShowDialog by rememberSaveable { mutableStateOf(false) }
 
     Row(

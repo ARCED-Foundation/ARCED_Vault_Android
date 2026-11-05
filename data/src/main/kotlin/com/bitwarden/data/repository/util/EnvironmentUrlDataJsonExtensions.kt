@@ -22,7 +22,9 @@ fun EnvironmentUrlDataJson.toEnvironmentUrls(): Environment =
 
 /**
  * Converts a nullable [EnvironmentUrlDataJson] to an [Environment], where `null` values default to
- * the US environment.
+ * the ARCEDians Vault server.
  */
 fun EnvironmentUrlDataJson?.toEnvironmentUrlsOrDefault(): Environment =
-    this?.toEnvironmentUrls() ?: Environment.Prod.Us
+    this?.toEnvironmentUrls() ?: Environment.SelfHosted(
+        environmentUrlData = EnvironmentUrlDataJson(base = "https://vault.arced.foundation"),
+    )

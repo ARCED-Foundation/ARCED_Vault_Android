@@ -1,0 +1,91 @@
+# Builds the signed ARCEDians Vault APK (F-Droid flavour: no Google services) for
+# vault.arced.foundation/get. Runs on a release tag such as v2026.9.1-arced.1.
+# The APK and latest.json go to the orphan branch android-dist (one commit, force-pushed);
+# the server's deploy workflow (ARCED_Password_Manager) unpacks that branch into
+# /get/download/android/.
+name: Build Android release
+
+on:
+  push:
+    tags: ["v*-arced.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: build-android
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Read version
+        id: version
+        run: |
+          name=$(sed -n 's/^appVersionName = "\(.*\)"$/\1/p' gradle/libs.versions.toml)
+          code=$(sed -n 's/^appVersionCode = "\(.*\)"$/\1/p' gradle/libs.versions.toml)
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$name" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match appVersionName $name"
+            exit 1
+          fi
+
+      - name: Decode signing key
+        env:
+          ARCED_KEYSTORE_BASE64: ${{ secrets.ARCED_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ARCED_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "ARCED_KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Build
+        env:
+          # Reads the Bitwarden SDK from Bitwarden's public GitHub Packages registry.
+          GITHUB_TOKEN: ${{ github.token }}
+          ARCED_KEYSTORE_PASSWORD: ${{ secrets.ARCED_KEYSTORE_PASSWORD }}
+          ARCED_KEY_PASSWORD: ${{ secrets.ARCED_KEYSTORE_PASSWORD }}
+          ARCED_KEY_ALIAS: ${{ secrets.ARCED_KEY_ALIAS }}
+        run: ./gradlew :app:assembleFdroidRelease --no-configuration-cache
+
+      - name: Publish to android-dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.name }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+        run: |
+          rm -f "$RUNNER_TEMP/release.jks"
+          apk=app/build/outputs/apk/fdroid/release/foundation.arced.vault-fdroid.apk
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs "$apk" | tee certs.txt
+          grep -qi "SHA-256 digest: 4b616138743f717b1992e3d5caeb1dc8ee409ec1319e5ab8744218a1f3a1de37" certs.txt \
+            || { echo "::error::APK is not signed with the ARCED release key"; exit 1; }
+          file="ARCEDians-Vault-$VERSION.apk"
+          mkdir out
+          cp "$apk" "out/$file"
+          jq -n --arg version "$VERSION" --argjson versionCode "$VERSION_CODE" --arg file "$file" \
+            --argjson size "$(stat -c %s "out/$file")" \
+            --arg sha256 "$(sha256sum "out/$file" | cut -d' ' -f1)" \
+            --arg built "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg commit "$GITHUB_SHA" \
+            '{version: $version, versionCode: $versionCode, file: $file, size: $size, sha256: $sha256, built: $built, commit: $commit}' \
+            > out/latest.json
+          cat out/latest.json
+          cd out
+          git init -q -b android-dist
+          git add .
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -qm "Android $VERSION from $GITHUB_SHA"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" android-dist

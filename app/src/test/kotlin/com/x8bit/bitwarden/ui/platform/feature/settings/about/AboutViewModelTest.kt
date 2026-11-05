@@ -254,7 +254,10 @@ private val DEFAULT_ABOUT_STATE: AboutState = AboutState(
     serverData = "\uD83C\uDF29 Server: 2025.7.1".asText(),
     deviceData = "<device_data>".asText(),
     ciData = "<ci_info>".asText(),
-    copyrightInfo = "© Bitwarden Inc. 2015-${Year.now(FIXED_CLOCK).value}".asText(),
+    copyrightInfo = (
+        "© ARCED Foundation ${Year.now(FIXED_CLOCK).value}\n" +
+            "Based on Bitwarden, © Bitwarden Inc. 2015-${Year.now(FIXED_CLOCK).value}, GPL-3.0"
+        ).asText(),
     isSubmitCrashLogsEnabled = false,
     shouldShowCrashLogsButton = true,
     isFlightRecorderEnabled = false,

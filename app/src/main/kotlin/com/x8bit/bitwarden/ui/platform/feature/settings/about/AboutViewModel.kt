@@ -69,7 +69,10 @@ class AboutViewModel @Inject constructor(
             flightRecorderSubtext = settingsRepository
                 .flightRecorderData
                 .getStopsLoggingStringForActiveLog(clock = clock),
-            copyrightInfo = "© Bitwarden Inc. 2015-${Year.now(clock).value}".asText(),
+            copyrightInfo = (
+                "© ARCED Foundation ${Year.now(clock).value}\n" +
+                    "Based on Bitwarden, © Bitwarden Inc. 2015-${Year.now(clock).value}, GPL-3.0"
+                ).asText(),
         )
     },
 ) {

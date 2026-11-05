@@ -250,11 +250,14 @@ private fun StartRegistrationContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        TermsAndPrivacyText(
-            onTermsClick = handler.onTermsClick,
-            onPrivacyPolicyClick = handler.onPrivacyPolicyClick,
-            modifier = Modifier.standardHorizontalMargin(),
-        )
+        // ARCED: Bitwarden's terms only apply to Bitwarden cloud.
+        if (state.selectedEnvironmentType != Environment.Type.SELF_HOSTED) {
+            TermsAndPrivacyText(
+                onTermsClick = handler.onTermsClick,
+                onPrivacyPolicyClick = handler.onPrivacyPolicyClick,
+                modifier = Modifier.standardHorizontalMargin(),
+            )
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
         Spacer(modifier = Modifier.navigationBarsPadding())

@@ -18,4 +18,5 @@ const val HEADER_VALUE_CLIENT_NAME: String = "mobile"
 /**
  * The value used for the 'bitwarden-client-version' headers.
  */
-const val HEADER_VALUE_CLIENT_VERSION: String = BuildConfig.VERSION_NAME
+// ARCED: send the upstream version (2026.9.1, not 2026.9.1-arced.1) so server version checks match.
+val HEADER_VALUE_CLIENT_VERSION: String = BuildConfig.VERSION_NAME.substringBefore("-arced")
