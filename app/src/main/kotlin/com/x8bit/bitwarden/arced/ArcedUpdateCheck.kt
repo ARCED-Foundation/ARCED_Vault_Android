@@ -19,18 +19,22 @@ private const val TIMEOUT_MS = 10_000
 
 /**
  * ARCED: the app is installed from vault.arced.foundation/get, not a store, so nothing updates it.
- * On start, fetch the published latest.json and offer the newer APK if there is one.
+ * Once per app start, fetch the published latest.json and offer the newer APK if there is one.
  * Any network or parsing error is ignored; the check simply runs again on the next start.
  */
 object ArcedUpdateCheck {
+    // Once per app process, so rotating the screen or restoring the activity doesn't ask again.
+    private var hasRun = false
+
     fun run(activity: AppCompatActivity) {
-        if (BuildConfig.ARCED_UPDATE_URL.isEmpty()) return
+        if (hasRun || BuildConfig.ARCED_UPDATE_URL.isEmpty()) return
+        hasRun = true
         activity.lifecycleScope.launch {
             val latest = withContext(Dispatchers.IO) { runCatching { fetch() }.getOrNull() }
                 ?: return@launch
             if (latest.versionCode <= BuildConfig.VERSION_CODE) return@launch
             activity.lifecycle.withStarted {
-                AlertDialog.Builder(activity)
+                AlertDialog.Builder(activity, R.style.ArcedUpdateDialog)
                     .setTitle(R.string.arced_update_available)
                     .setMessage(activity.getString(R.string.arced_update_message, latest.version))
                     .setPositiveButton(R.string.arced_update_download) { _, _ ->

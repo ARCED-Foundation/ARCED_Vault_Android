@@ -58,7 +58,7 @@ jobs:
           ARCED_KEYSTORE_PASSWORD: ${{ secrets.ARCED_KEYSTORE_PASSWORD }}
           ARCED_KEY_PASSWORD: ${{ secrets.ARCED_KEYSTORE_PASSWORD }}
           ARCED_KEY_ALIAS: ${{ secrets.ARCED_KEY_ALIAS }}
-        run: ./gradlew :app:assembleFdroidRelease --no-configuration-cache
+        run: ./gradlew :app:assembleFdroidRelease -ParcedAbis=arm64-v8a,armeabi-v7a
 
       - name: Publish to android-dist
         env:

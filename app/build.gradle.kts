@@ -82,6 +82,11 @@ configure<ApplicationExtension> {
             name = "SDK_VERSION",
             value = "\"${libs.versions.bitwardenSdk.get()}\"",
         )
+        // ARCED: CI ships phone ABIs only (-ParcedAbis=arm64-v8a,armeabi-v7a), about half the
+        // size; local builds keep all ABIs so they run on x86 emulators.
+        (findProperty("arcedAbis") as String?)?.let { abis ->
+            ndk { abiFilters += abis.split(",") }
+        }
         // ARCED: where the in-app update check looks. Override with -ParcedUpdateUrl=... (or
         // set it to "" to switch the check off).
         buildConfigField(

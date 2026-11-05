@@ -6,14 +6,15 @@ import kotlinx.serialization.Serializable
 /**
  * Represents the data used to authenticate with the master password.
  */
+// ARCED: camelCase names, because Vaultwarden matches JSON keys case-sensitively.
 @Serializable
 data class MasterPasswordAuthenticationDataJson(
-    @SerialName("Kdf")
+    @SerialName("kdf")
     val kdf: KdfJson,
 
-    @SerialName("MasterPasswordAuthenticationHash")
+    @SerialName("masterPasswordAuthenticationHash")
     val masterPasswordAuthenticationHash: String,
 
-    @SerialName("Salt")
+    @SerialName("salt")
     val salt: String,
 )

@@ -115,8 +115,8 @@ class MainActivity : AppCompatActivity() {
         window.decorView.filterTouchesWhenObscured = true
         if (savedInstanceState == null) {
             mainViewModel.trySendAction(MainAction.ReceiveFirstIntent(intent = intent))
-            ArcedUpdateCheck.run(activity = this)
         }
+        ArcedUpdateCheck.run(activity = this)
 
         // Within the app the theme will change dynamically and will be managed by the
         // OS, but we need to ensure we properly set the values when upgrading from older versions

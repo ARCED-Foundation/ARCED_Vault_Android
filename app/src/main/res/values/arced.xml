@@ -5,4 +5,8 @@
     <string name="arced_update_message" translatable="false">ARCEDians Vault %1$s is available. Download it now, then open the file to install it.</string>
     <string name="arced_update_download" translatable="false">Download</string>
     <string name="arced_update_later" translatable="false">Later</string>
+    <!-- Update dialog buttons in ARCED Charcoal instead of the AppCompat teal. -->
+    <style name="ArcedUpdateDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="colorAccent">#FF39302A</item>
+    </style>
 </resources>

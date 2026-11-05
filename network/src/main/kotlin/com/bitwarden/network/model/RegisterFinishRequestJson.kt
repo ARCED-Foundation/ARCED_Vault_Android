@@ -27,10 +27,10 @@ data class RegisterFinishRequestJson(
     @SerialName("userAsymmetricKeys")
     val userAsymmetricKeys: KeysJson,
 
-    @SerialName("MasterPasswordAuthentication")
+    @SerialName("masterPasswordAuthentication")
     val authenticationData: MasterPasswordAuthenticationDataJson,
 
-    @SerialName("MasterPasswordUnlock")
+    @SerialName("masterPasswordUnlock")
     val unlockData: MasterPasswordUnlockDataJson,
 ) {
     constructor(
