@@ -2,7 +2,8 @@
 # vault.arced.foundation/get. Runs on a release tag such as v2026.9.1-arced.1.
 # The APK and latest.json go to the orphan branch android-dist (one commit, force-pushed);
 # the server's deploy workflow (ARCED_Password_Manager) unpacks that branch into
-# /get/download/android/.
+# /get/download/android/. To rebuild a release: Actions → Build Android release → Run
+# workflow, and pick the release tag.
 name: Build Android release
 
 on:
