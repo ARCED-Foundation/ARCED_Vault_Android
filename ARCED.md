@@ -17,6 +17,22 @@ ARCEDians Vault for Android: the Bitwarden Android app, rebranded and preset to
 Only the F-Droid flavour is built (`fdroidRelease`): no Firebase, Play Services, push relay
 or Play billing. The vault syncs on unlock and on pull-to-refresh, which is on by default.
 
+## Test status
+
+`2026.9.1-arced.1`, tested 2026-11-05 and 2026-11-24 on emulators (Android 10 and 16) against a
+local Vaultwarden 1.37.3:
+
+- Passed: fresh install opens on the ARCED server with no region picker; create account (after
+  the camelCase fix below); log in; authenticator (TOTP) two-step login; item create and sync;
+  offline unlock and reading items; autofill service selectable in Android settings; fingerprint
+  unlock (Android 16; the Android 10 emulator's sensor isn't "strong" class, so the app correctly
+  hides the option there); signed release installed over an earlier signed release, and the dev
+  build over an earlier dev build while logged in; update dialog and its download link; About
+  notice; light and dark themes; launcher icon.
+- Not tested: email two-step login (no mail server locally) and WebAuthn (no authenticator on the
+  emulator). Both use Vaultwarden's endpoints and the server's own connector page
+  (`/webauthn-mobile-connector.html`, which returns 200 on production), never bitwarden.com.
+
 ## Signing
 
 - Application ID: `foundation.arced.vault` (permanent: a different ID is a different app).
